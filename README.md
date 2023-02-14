@@ -36,78 +36,107 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-# [Logistic Regression with a Neural Network mindset](Weight_Initialization)
+# [Weight Initialization](Weight_Initialization)
 In this repo,
 
-I built the general architecture of a learning algorithm, including:
-Initializing my parameters
-Calculating the cost function and its gradient
-Using an optimization algorithm (gradient descent)
-I gathered all three functions above into a main model function, in the right order. Here are couple of functions that I implemented
+I will use a 3-layer neural network. I will experiment with the following initialization methods:
 
-### Logistic Cost Function
-$$J(\theta) = -\frac{1}{m}\sum_{i=1}^{m}[y^{(i)}\log(h_\theta(x^{(i)})) + (1-y^{(i)})\log(1-h_\theta(x^{(i)}))]$$
-Where:
-- `m` is the number of training examples
-- `y` is the true label of the training example
-- `x` is the input feature of the training example
-- `h(x)` is the predicted label (hypothesis) of the input feature x
-- `J(θ)` is the cost function
-- `θ` is the weight parameter
+- Zeros Initialization - by setting initialization = "zeros" in the input argument.
 
-### The sigmoid function is defined as:
+- Random Initialization - by setting initialization = "random" in the input argument. This initializes the weights to large random values.
+- He Initialization - by setting initialization = "he" in the input argument. This initializes the weights to random values scaled according to a paper by He et al., 2015.
 
-$$ \sigma(z) = \frac{1}{1 + e^{-z}} $$
+Instructions: read over the code and run it. In the next part, I will implement the three initialization methods that the model() function calls.
 
-Where `z` is the input to the function.
+For this classifier, you want to separate the blue dots from the red dots.
+
+![Image alt text](Images/data.png)
 
 
 
 
-The Backpropagation using Gradient Descent algorithm is defined as:
+##  Initialization
 
-1. Initialize the weights with random values.
-2. Feed forward the inputs through the network and calculate the output.
-3. Calculate the error.
-4. Propagate the error back through the network using the chain rule of calculus.
-5. Calculate the gradient of the cost function with respect to the weights 
-   $$ \frac{\partial E}{\partial w_{i,j}} $$
-6. Update the weights with the following equation:
-   $$ w_{i,j} = w_{i,j} - \alpha \frac{\partial E}{\partial w_{i,j}} $$
-7. Repeat steps 2-6 for a fixed number of iterations or until the error reaches a certain threshold.
-
-Where:
-- `w_{i,j}` is the weight of the connection between unit i and unit j
-- `E` is the error function
-- `alpha` is the learning rate
-
-### ReLU:
-$$ f(x) = max(0,x) $$
-
-### tanH
-
-$$ f(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}} $$
+There are two types of parameters to initialize in a neural network:
+- the weight matrices $(W^{[1]}, W^{[2]}, W^{[3]}, ..., W^{[L-1]}, W^{[L]})$
+- the bias vectors $(b^{[1]}, b^{[2]}, b^{[3]}, ..., b^{[L-1]}, b^{[L]})$
 
 
-ReLU is a commonly used activation function in neural networks, it's defined as f(x) = max(0,x). It's computationally efficient, and it helps to prevent the vanishing gradient problem.
 
-tanh is also a commonly used activation function in neural networks, it's defined as f(x) = (e^x - e^-x) / (e^x + e^-x). It outputs values between -1 and 1, which makes it useful in cases where the output of the neuron should be bounded.
-
-
-![Image alt text](Images/Img1.png)
+### Zero Initialization
+![Image alt text](Images/0loss.png)
+![Image alt text](Images/0res.png)
 
 
-# [NN_aplication](./NN_aplication/)
-In this repo,
-
-I built my cat/not-a-cat classifier using the functions from the previous assignment to build a deep network. I used the ReLU and tanh activation functions, which helped me to improve the accuracy over my previous logistic regression implementation. I found that ussing a deep network resulted in a higher accuracy for my classifier. I hope this information is helpful for your understanding.
-
-![cat image](Images/img2.png)
+### Random Initialization
+![Image alt text](Images/randloss.png)
+![Image alt text](Images/radomres.png)
 
 
-# [Planar data classification with one hidden layer](./Planar%20data%20classification%20with%20one%20hidden%20layer/)
-In this repo,
+### He Initialization
+$$W = \mathcal{N}(\mu=0,\ \sigma=\sqrt{\frac{2}{n_{l-1}}})\ $$
 
-I accomplished building a 2-class classification neural network with a single hidden layer using units with a non-linear activation function, such as tanh. I computed the cross-entropy loss and implemented forward and backward propagation. These techniques helped me to improve the accuracy of my classifier, and I was able to achieve better results than my previous logistic regression implementation on planar data.
+where,
 
-![cplanar](Images/img3.png)
+$W$ represents the weight matrix
+$\mathcal{N}$ represents a normal distribution
+$\mu$ represents the mean of the normal distribution and is set to 0
+$\sigma$ represents the standard deviation of the normal distribution
+$n_{l-1}$ represents the number of neurons in the previous layer
+This formula initializes the weights with random values sampled from a normal distribution with a mean of 0 and a standard deviation of $\sqrt{\frac{2}{n_{l-1}}}$.
+![Image alt text](Images/heloss.png)
+![Image alt text](Images/heres.png)
+
+
+# [Regularization](Regularization)
+In this repo I am using some regularization to avoid overfitting. I'll modify cost function using Ridge Technique and also will apply Dropout Method
+
+<a name='5'></a>
+## L2 Regularization
+
+The standard way to avoid overfitting is called **L2 regularization**. It consists of appropriately modifying my cost function, from:
+$$J = -\frac{1}{m} \sum\limits_{i = 1}^{m} \large{(}\small  y^{(i)}\log\left(a^{[L](i)}\right) + (1-y^{(i)})\log\left(1- a^{[L](i)}\right) \large{)} \tag{1}$$
+To:
+$$J_{regularized} = \small \underbrace{-\frac{1}{m} \sum\limits_{i = 1}^{m} \large{(}\small y^{(i)}\log\left(a^{[L](i)}\right) + (1-y^{(i)})\log\left(1- a^{[L](i)}\right) \large{)} }_\text{cross-entropy cost} + \underbrace{\frac{1}{m} \frac{\lambda}{2} \sum\limits_l\sum\limits_k\sum\limits_j W_{k,j}^{[l]2} }_\text{L2 regularization cost} \tag{2}$$
+
+Let's modify the cost and observe the consequences.
+
+<a name='ex-1'></a>
+### Compute_cost_with_regularization
+Implement `compute_cost_with_regularization()` which computes the cost given by formula (2). To calculate $\sum\limits_k\sum\limits_j W_{k,j}^{[l]2}$  , use :
+```python
+np.sum(np.square(Wl))
+```
+Note that I had to do this for $W^{[1]}$, $W^{[2]}$ and $W^{[3]}$, then sum the three terms and multiply by $ \frac{1}{m} \frac{\lambda}{2} $.
+
+
+## Dropout is a widely used regularization technique that is specific to deep learning. It randomly shuts down some neurons in each iteration.
+
+
+In lecture, we dicussed creating a variable $d^{[1]}$ with the same shape as $a^{[1]}$ using `np.random.rand()` to randomly get numbers between 0 and 1. Here, you will use a vectorized implementation, so create a random matrix $D^{[1]} = [d^{[1](1)} d^{[1](2)} ... d^{[1](m)}] $ of the same dimension as $A^{[1]}$.
+2. Set each entry of $D^{[1]}$ to be 1 with probability (`keep_prob`), and 0 otherwise.
+
+**Hint:** Let's say that keep_prob = 0.8, which means that we want to keep about 80% of the neurons and drop out about 20% of them.  We want to generate a vector that has 1's and 0's, where about 80% of them are 1 and about 20% are 0.
+This python statement:  
+`X = (X < keep_prob).astype(int)`  
+
+is conceptually the same as this if-else statement (for the simple case of a one-dimensional array) :
+
+```
+for i,v in enumerate(x):
+    if v < keep_prob:
+        x[i] = 1
+    else: # v >= keep_prob
+        x[i] = 0
+```
+Note that the `X = (X < keep_prob).astype(int)` works with multi-dimensional arrays, and the resulting output preserves the dimensions of the input array.
+
+Also note that without using `.astype(int)`, the result is an array of booleans `True` and `False`, which Python automatically converts to 1 and 0 if we multiply it with numbers.  (However, it's better practice to convert data into the data type that we intend, so try using `.astype(int)`.)
+
+3. Set $A^{[1]}$ to $A^{[1]} * D^{[1]}$. (You are shutting down some neurons). You can think of $D^{[1]}$ as a mask, so that when it is multiplied with another matrix, it shuts down some of the values.
+4. Divide $A^{[1]}$ by `keep_prob`. By doing this you are assuring that the result of the cost will still have the same expected value as without drop-out. (This technique is also called inverted dropout.)
+
+
+# [Gradient Checking](Gradient_Checking)
+
+![Image alt text](Images/grad.png)
