@@ -36,7 +36,7 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-# [Logistic Regression with a Neural Network mindset](./Logistic%20Regression%20with%20a%20Neural%20Network%20/)
+# [Logistic Regression with a Neural Network mindset](Weight_Initialization)
 In this repo,
 
 I built the general architecture of a learning algorithm, including:
